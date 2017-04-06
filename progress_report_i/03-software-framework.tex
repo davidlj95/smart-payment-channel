@@ -1,0 +1,43 @@
+\chapter*{The software framework}
+\addcontentsline{toc}{chapter}{The software framework}
+\label{chap:software_framework}
+Once the research was full-filled and (most part of) transactions were understood at a byte low-level, we started developing our software. 
+\section{The goals}
+The main goal for our software was to create simple P2PKH transactions in this first iteration of the development, to then be able to perform more iterations and add more complex transactions, until completing the project goal of creating the transactions needed to create and operate \textit{Bitcoin Payment Channels}.
+\section{Technologies and environment setup}
+We decided to use \textit{Python 3.6} because of our experience developing applications using this programming language and the ability it provides to focus on adding and implementing features quickly without having to worry much about low-level coding aspects like memory handling, centering the efforts ind adding value to the application and therefore, to the project.
+
+\subsection{Libraries}
+After deciding the programming language, we searched for libraries that helped us performing complex operations like signatures, encoding operations, ...\\\\
+We used the following ones:
+\begin{itemize}
+    \item \textbf{python-bitcoinlib\cite{python-bitcoinlib:online}}\\
+    Provides handling of base58 encoding, scripts, public keys and data structures in general of the Bitcoin protocol
+    \item \textbf{pybitcointools\cite{pybitcointools:online}}\\
+    Library to perform common cryptographic operations in Bitcoin, providing an easy interface that converts the format of the input parameters automatically to avoid tedious format conversions
+\end{itemize}
+
+\subsection{Version control system}
+We use Git, as mentioned in the initial report to handle the software versions and work in parallel. The source code of the project is publicly available\footnote{Checkout \url{https://www.uab.codes} to stay informed about the latest releases}:
+\begin{center}
+\url{https://github.com/uab-projects/btc-payment-channels}\footnote{Ensure to check the \code{development} branch as we don't spend time launching \textit{releases} very often as the code it's in continuous progress}
+\end{center}
+
+\section{The architecture and design}
+As we said in the previous research chapter conclusions, there was a need of modelling the Bitcoin items in order to provide a better understanding and an abstraction to allow fast feature development without having to worry for low-level programming-language details. Following this non-functional requirements in aim to provide a better library for Bitcoin Python developers, we modelled all items that were in the scope of the project using OOP:
+\begin{itemize}
+    \item \textbf{Address}\\ An address allows to set how the funds must be spent in a transaction output, and can also contain public or private keys. Our model must provide an easy interface to create them using the items that they require, depending on the address type, that we'll also model. From an address, we have to be able to create automatically an output script if the address type matches (ie: does not contain a public / private key)
+    \item \textbf{Script}\\ A script must be able to contain a list of fields (opcodes an data fields) to be able to set the spend conditions or to spend some output script. Therefore we can model a basic script, input, output, redeem and payment scripts and use the factory design pattern to easily build the most known types.
+    \item \textbf{Input}\\ Contains the reference to the previous transaction, number of output, spending script, and sequence field
+    \item \textbf{Output}\\ Contains the value to spend and the script with the conditions to spend
+    \item \textbf{Transaction} \\ Contains all the transaction fields, version, inputs, outputs and locktime field
+\end{itemize}
+With all these items modelled and handled with easy, defining all formats of inputs and ouputs in an extensive in-code documentation, we provide a very good framework to work with and easily extend it using the items to create new transactions. We just have to have a way to transform them into bytes.
+\subsection{The serializable interface}
+To allow modularity and the easy combination of all the models, each of it must implement the serializable interface, that basically means that the object has to be able to be converted into an array of bytes (a \textit{bytes} built-in object in Python), with the \code{serialize()} method. Optionally (as it's not a feature to accomplish our project main goals), also has to implement a \code{deserialize} method, to create a new object from an array of bytes.\\\\
+This way, we can create several objects from our models and join them as if we joined arrays of bytes, but with the ease of creation of a built-in Python classes instantiation, friendly for developers.
+\subsection{The libraries' use}
+If all these models have been created, why have we mentioned the previous libraries? We have just coded the models and joined them together, but the algorithmic parts and complex operations have been delegated to those libraries, such as base58 encoding and decoding for addresses and ECDSA signatures. The rest has been coded by ourselves.
+\section{A basic transaction creation}
+Once all the models have been coded and its serialization implemented, we have tested our framework by creating a P2PKH basic transaction that transfers funds creating a signature and setting the public key (hash) to pay to.\\\\ After several ECDSA signatures format mistakes and misunderstandings, we succesfully broadcasted a valid and confirmed transaction moving funds between ourselves.\footnote{The transaction can bee seen in the following \textit{testnet} block explorer using its \code{txId}: \url{https://tbtc.blockr.io/tx/info/258fb211724412d6ec6a531973c58233143e6ab355623658adc3164a5c70bd5b}}
+The transaction was created before the milestone deadline scheduled, the 20th of March of 2017
