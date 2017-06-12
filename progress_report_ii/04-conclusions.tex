@@ -1,0 +1,18 @@
+\chapter*{Results and conclusions}
+\addcontentsline{toc}{chapter}{Results and conclusions}
+\markboth{Conclusions}{}
+\label{chap:conclusions}
+\section{Project status and schedule}
+After reviewing the Gantt's diagram of the previous progress report, we can see that according to the the current status (testing the funding transaction of a bidirectional payment channel), we are two weeks on delay compared with the estimated schedule proposed on the previous document.
+
+The problems that surged in order to reach that delay were:
+\begin{itemize}
+    \item \textbf{More research time than expected:} We thought that with our knowledge acquired until the last progress report we would spend less time in each iteration performing research tasks and more time doing testing would be required. What happened is that the more advanced or non-standard scripts you are developing, the less information you find. It was true that we also required more test time, and less development as we developed a great and usable framework, but the research task time couldn't be reduced because of the lack of sources. To avoid long searches, I decided to use the Bitcoin Core implementation code as the main source of information as it's the code that will be executed to check our transactions and despite being hard to understand because of the advanced C++ syntax used, the efforts of understanding the code are paid as the knowledge obtained will be valid without any doubt.
+\item \textbf{Personal timing issues:} Some weeks we couldn't complete the iterations because I started an scholarship that takes more time than expected and therefore each iteration was delayed more than necessary.
+\end{itemize}
+
+To reschedule the project, we skipped implementing the two transactions (refund and fund) method to open a channel, as the one-transaction works and is more secure and I will use the Bitcoin Core implementation as my main source of information to ensure the validity and accuracy of the knowledge obtained. With this changes, I expect to be on-schedule after testing the bidirectional payment channel funding transaction.
+\section{About the development}
+Since last progress report, I've learned how P2SH transactions are created and spent, what a BIP exactly is, how it is created, developed, tested and requested to be introduced as a feature in the network, and how the BIP-65 works implying that I understand the \code{nLocktime} exact meaning and operation, and also how \code{nSequence} works because it also was a requirement for BIP-65.
+
+After reading the whitepaper, I think no extra knowledge should be necessary to develop the payment channel rather than creating and testing the transaction with its scripts, but it's very optimistic to say it. Despite that, and with the changes performed to the research tasks (look first the Bitcoin Core implementation, as I'm know more familiarized with it), I think I'll be able to develop a bidirectional payment channel as on schedule, despite maybe I'll have to skip optional features like the channel automation so the channel can be used by any user with a minimal knowledge about Bitcoin.

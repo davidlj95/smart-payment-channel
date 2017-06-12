@@ -1,0 +1,62 @@
+\chapter*{Unidirectional payment channels}
+\addcontentsline{toc}{chapter}{Unidirectional payment channels}
+\markboth{Unidirectional payment channels}{}
+\label{chap:unidir-pc}
+\section{The funding script}
+In the previous progress report, we designed the following redeem script to create the funding transaction of an unidirectional payment channel\footnote{Because of a typo error, \code{OP\_CHECKMULTISIG and OP\_ENDIF} did not appear in the 0.1 version of the report}:
+\begin{center}
+\code{OP\_0 <sigA> <sigB> | OP\_2 <pubKeyA> <pubKeyB> OP\_2 OP\_CHECKMULTISIG OP\_NOTIF <time> OP\_CHECKLOCKTIMEVERIFY OP\_DROP <PubKeyFounder> OP\_CHECKSIG OP\_ENDIF}
+\end{center}
+Note that the character "\code{|}" separes the data needed to pay the redeem script from the redeem script itself. Therefore the first part will be the data (along with the redeem script itself) to be used in the scriptSig that spends the script and the hash of the second part the hash to put in the P2SH output to fund the channel.
+
+What we wanted to achieve was that, after a transaction was sent paying to this redeem script (technically speaking paying to its hash, with a P2SH scriptPubKey), the payments of the channel could be performed by using a multisig, until the specified time (the expiry date of the channel) where the founder could refund his funds in case of no cooperation of the second party. Therefore, the founder owns both \code{<pubKeyA>} and \code{<pubKeyFounder>} private keys.
+
+Summarizing, there are two ways to spend this script:
+\begin{itemize}
+    \item \textbf{Using the payment channel:} The founder, when want to send funds to the second party, creates a transaction spending this script before the expiry time arrives and sends it to the second party (with founder's signature included) sending some amount to the second party and some amount to themself as return. If the second party wants to close the channel, signs to complete the multisig and sends the last transaction to the blockchain (because as more transactions are given by the founder, the last is supposed to give more amount than the previous ones, so the previous ones are discarded). In this case, the signatures wil be correct so \code{OP\_CHECKMULTISIG} will return \code{OP\_TRUE}, the \code{OP\_NOTIF} statements block including the \code{OP\_CHECKLOCKTIMEVERIFY} won't be executed and the transactions will be valid.
+    \item \textbf{Waiting for expiry time:} If the second party does not cooperate, there has to be a way for the founder to get back his funds if the payment channel is not used before the expiry time. Because of that, it exists the \code{OP\_CHECKLOCKTIME} verify code. It will allow to spend the funds after the time specified has been reached, just needing one signature, the founder's signature. But to do that, we have to reach \code{OP\_NOTIF} and the only way is to make \code{OP\_CHECKMULTISIG} fail, for example, using in \code{<sigA>,<sigB>} the same signature, created with private key matching \code{<pubKeyA>}, that the founder owns. And previous to that \code{OP\_0}, put the signature created with the private key matching \code{<pubKeyFounder>} public key to spend it. This is not optimal, as to select payment method, we have to make \code{OP\_CHECKMULTISIG} fail and append data (two bad signatures) that occupies unnecessary space. Despite that, the transaction would be spendable after a certain period of time.
+\end{itemize}
+Therefore, and after consulting with our teachers, we got a valid script to operate a unidirectional channel, despite it could be optimized by creating a non-standard transaction.
+\subsection{Implementing the script}
+To implement the script using our framework, we had to implement new opcodes (\code{OP\_0, OP\_2, OP\_CHECKMULTISIG, OP\_NOTIF, OP\_ENDIF}, compose them all together and create a transaction to fund the script and then spend that script.
+
+\subsubsection{First problem: P2SH signatures}
+Creating a P2PKH transaction spending an UTXO with a P2PKH scriptPubKey with a P2PKH scriptSig with just an output to pay to a P2SH scriptPubKey with the hash of the redeem script implemented was not a problem, as we had all the tools needed and the transaction was accepted without any problems.
+
+The problems came when wanting to spend that P2SH UTXO created, as the signature did not match according to the errors the Bitcoin Core implementation told us when trying to send the raw transaction. We checked again all the methods that created signatures, but did not know where the source of the problem was, as we succesfully had tested those methods creating P2PKH transactions. It was not until we reviewed an article describing how a simple P2SH worked (just a multisig P2SH)\cite{soroushjp-multisig:online} and reverse engineered the Bitcoin Core code to check where the error was triggered\cite{bitcoin-core:online} that we found the mistake: \textbf{when signing a P2SH UTXO, and creating the pseudo-transaction to be signed, the input script being signed has to be replaced by the redeem script, instead of the scriptPubkey when dealing with P2PKH outputs}. AFter that, we created a transaction to fund and spend a simple multisig redeem script and continued with our development.
+
+\subsubsection{Second problem: \code{OP\_CHECKLOCKTIMEVERIFY} operation}
+The second problem we found is dealing with \code{OP\_CHECKLOCKTIMEVERIFY}. To deal with that opcode, we read the document where it was proposed\cite{bip-65:online} (as it didn't exist before in the original code, it was an improvement that reimplemented a no operation opcode). Reading the document, we found that previously to understand this opcode, we had to fully understand the \code{nLocktime} field meaning in a transaction (until now, we used \code{0} in that field as was the default, recommended value). 
+
+After reading several questions on a Q&A site about Bitcoin\cite{se-locktime-persist:online, se-locktime-understanding:online}, we understood the meaning of the field. When specified in a transaction, the field makes the transaction \textbf{invalid}\footnote{It's important to know that when speaking in Bitcoin terms, an \textbf{invalid transaction} means the transaction won't be accepted by the network (won't be accepted in the mempool either and therefore neither mined) and an \textbf{unspendable transaction} will be accepted and can be mined, but won't be spendable. The invalidity or unspendability can be tepmoral, as in case of the locktime transactions, or permanent}until the lock time (can be specified using either an absolute block number or a UNIX timestamp) is reached.
+
+We thought we had understood everything until we started testing with some scripts that appear as an example in the opcode definition document\cite{bip-65:online}. At first, the document does not clearly specify how the \code{<time>} field must be indicated (little-endian, big-endian, size...), rather than referencing to a class named \code{CScriptNum} in the Bitcoin Core implementation and saying it can take up to 5 bytes and use the minimum bytes possible.
+
+After consulting one of our teachers Sergi, who refers us to a question in the same Q&A site\cite{se-locktime-specification:online} and looking in the Bitcoin Core implementation C++  code\footnote{\url{https://github.com/bitcoin/bitcoin/blob/master/src/script/script.h#L358-L360}}, we couldn't find that it was a little-endian encoded number that takes the minimum bytes possible. 
+
+But once specifying the time in the correct format, we couldn't still fund and spend the script: we didn't know how the check against the time was performed. After reviewing the Bitcoin Core implemenation of the opcode, \footnote{\url{https://github.com/bitcoin/bitcoin/blob/master/src/script/interpreter.cpp#L1272-L1306}} we didn't understand how the check was performed. The comparison of the time specified in the script is against the field \code{nLocktime} of the transaction, so if we don't specify a higher \code{nLocktime} in the transaction than the time in the script, the operation \code{OP\_CHECKLOCKTIMEVERIFY} will fail. For this reason, the \code{nLocktime} field and the time in the script must be in the same format (or both specify UNIX timestamps, or both specify an absolute block number). 
+
+After that, we could spend a P2SH transaction that uses a \code{OP\_CHECKMULTISIG} and \code{OP\_CHECKLOCKTIMEVERIFY} opcode\footnote{\url{https://tbtc.blockr.io/tx/info/8dc10f058a0c6ee6ba481cfdb8cd350a5b406f76a024cdcbd96a87931372cb46}}
+
+\subsubsection{Redesigning the script:}
+After digging into the Bitcoin Core implementation\cite{bitcoin-core:online}, and reading carefully the BIP-65 document\cite{bip-65:online}, we designed a model for time locked scripts, that contain a script that can be spent just after a certain time and a script that can always be used to spend it. We called that in our framework a \code{TimeLockedScript}, whose model is the next:
+\begin{center}
+\code{OP\_IF <time> OP\_CHECKLOCKTIMEVERIFY OP\_DROP <timelocked\_script> OP\_ELSE <unlocked\_script> OP\_ENDIF <lifetime\_script>}
+\end{center}
+What this scripts allows us is:
+\begin{itemize}
+    \item \textbf{Specify how are we spending it}: When we are spending, we can select if we're paying to the script using the locktime condition (therefore, the locktime has been reached), or if we're paying to the script before the locktime arrives, just by specifying \code{OP\_0} or \code{OP\_1} in the data to pay the script. If you specify \code{OP\_1}, you'll enter in the locktime condition and with \code{OP\_0} you'll be able to pay before the locktime.3
+    \item \textbf{Specify a script for each condition}: We can specify a script to be used to pay after the locktime, and the script to pay before the locktime arrives (or at anytime). This way with this model more scripts can be designed rather than an opening unidirectional channel script (escrow script for instance).
+\end{itemize}
+\subsection{The unidirectional channel implementation}
+Finally our redeem script for the channel was:
+\begin{center}
+\code{OP\_IF <time> OP\_CHECKLOCKTIMEVERIFY OP\_DROP <PubKeyFounder> OP\_CHECKSIG OP\_ELSE OP\_2 <PubKeyA> <PubKeyB> OP\_2 OP\_CHECKMULTISIG OP\_ENDIF}
+\end{center}
+With this script, we could create and test after that all the transactions for the channel:
+\begin{itemize}
+    \item \textbf{Funding}: A transaction spending a P2PKH scriptSig and with a P2SH output paying to the previously mentioned redeem script hash
+    \item \textbf{Payment}: A transaction signed by both parties (firstly signed by the founder) spending the redeem script with the \code{OP\_CHECKMULTISIG} statement specifying an \code{OP\_FALSE} and whose outputs are P2PKH scriptPubKeys to the payed and to the founder as a return.
+    \item \textbf{Refund}: A transaction signed by the founder, and with \code{nLocktime} field set after the \code{<time>} field specified in the script, spending the transaction with just its signature as specifies to pay with the first block of the redeem script with an \code{OP\_TRUE} and whose output is a P2PKH output to an address the founder owns.
+    \item \textbf{Closure}: The same transaction as the payment can act as a closure if sent to the network. It has to be sent by the payed user before the expiry time or the founder could use the refund transaction so payment transactions would be invalid.
+\end{itemize}
