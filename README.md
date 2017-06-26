@@ -11,7 +11,8 @@ Course 2016-2017
 </center>
 # Reports
 The following reports have been written during the project development:
-> As the reports are stored in a repository, just current versions are included in this package, old versions are links to the old repository versions
+> - As the reports are stored in a repository, just current versions are included in this package, old versions are links to the old repository versions
+> - TEX sources and sources folder only work in local or offline versions
 ## Initial report
 Explaining the project at a high level and the main project goals, introducing the methodology and schedule.
 ### Versions
@@ -21,6 +22,8 @@ Date: 04/03/2017
  - [HTML format](initial_report/initial_report.html)
  - [Markdown format](initial_report/initial_report.md)
  - [Sources folder](initial_report)
+
+[Changelog](https://github.com/davidlj95/smart-payment-channel/commit/e4fa1f41baf3f5f6dbbac3e77551f6d5d53dde4f)
 ## First progress report
 An improved version of the initial report in format and detail, also explaining the progress performed until the document creation.
 ### Versions
@@ -28,10 +31,13 @@ An improved version of the initial report in format and detail, also explaining 
 Date: 06/04/2017
  - [PDF format](https://github.com/davidlj95/smart-payment-channel/raw/7abc529a17235384ceae975b9b46d863403d1630/progress_report_i/Report.pdf)
  - [TEX sources](https://github.com/davidlj95/smart-payment-channel/tree/7abc529a17235384ceae975b9b46d863403d1630/progress_report_i)
+[Changelog](https://github.com/davidlj95/smart-payment-channel/commit/7abc529a17235384ceae975b9b46d863403d1630)
 #### Delivered version
 Date: 08/04/2017
  - [PDF format](progress_report_i/progress_report_i.pdf)
  - [TEX sources](progress_report_i)
+
+[Changelog](https://github.com/davidlj95/smart-payment-channel/commit/0b69329e14a6ec350809f0c0d1351cb1a4ac0bb9)
 ## Second progress report
 Details about the progress of the project at a 2/3 stage
 ### Versions
@@ -39,10 +45,14 @@ Details about the progress of the project at a 2/3 stage
 Date: 18/05/2017
  - [PDF format](https://github.com/davidlj95/smart-payment-channel/raw/2a6059b89ca8461ab49e0799e3bcf5f4c432e725/progress_report_ii/progress_report_ii.pdf)
  - [TEX sources](https://github.com/davidlj95/smart-payment-channel/tree/2a6059b89ca8461ab49e0799e3bcf5f4c432e725/progress_report_ii)
+
+[Changelog](https://github.com/davidlj95/smart-payment-channel/commit/2a6059b89ca8461ab49e0799e3bcf5f4c432e725)
 #### Delivered version
 Date: 20/05/2017
 - [PDF format](progress_report_ii/progress_report_ii.pdf)
 - [TEX sources](progress_report_ii)
+
+[Changelog](https://github.com/davidlj95/smart-payment-channel/commit/2f2cfafbb669459921eaaef58da40a753e186809)
 ## Whitepaper
 IEEE journal article describing the project and the results obtained
 ### Versions
@@ -50,10 +60,14 @@ IEEE journal article describing the project and the results obtained
 Date: 08/06/2017
 - [PDF format](https://github.com/davidlj95/smart-payment-channel/raw/1d7b03a7a8c98cfcdc1bb91587b00ab9456d58c0/whitepaper/whitepaper.pdf)
 - [TEX sources](https://github.com/davidlj95/smart-payment-channel/tree/1d7b03a7a8c98cfcdc1bb91587b00ab9456d58c0/whitepaper)
+
+[Changelog](https://github.com/davidlj95/smart-payment-channel/commit/1d7b03a7a8c98cfcdc1bb91587b00ab9456d58c0)
 #### Delivered version
 Date: 10/06/2017
 - [PDF format](whitepaper/whitepaper.pdf)
 - [TEX sources](whitepaper)
+
+[Changelog](https://github.com/davidlj95/smart-payment-channel/commit/889a219ea6930e219604e876d4fc172d6884cd33)
 # Code
 The project code is available on the following GitHub repository:
 <center>
