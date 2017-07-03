@@ -9,7 +9,7 @@
 \usepackage[T1]{fontenc}    % this is needed for correct output
                             % of umlauts in pdf
 \usepackage{mathtools}      % maths
-\setbeamerfont{myTOC}{series=\bfseries,size=\Large}
+\setbeamerfont{myTOC}{series=\bfseries,size=\normalsize}
 \AtBeginSection[]{\frame{\frametitle{Outline}%
                   \usebeamerfont{myTOC}\tableofcontents[current]}}
 
@@ -550,12 +550,12 @@
   We now need to spend the \textit{redeemScript}
   \pause
   \begin{center}
-   \texttt{<sig\_Alice> <sig\_Bob> OP\_0}
+   \texttt{OP\_0 <sig\_Alice> <sig\_Bob> OP\_0}
   \end{center}
  \end{exampleblock}
  \begin{exampleblock}{Technically...}
   As we are spending a P2SH, then the input script must be:\
-  \texttt{<sig\_Alice> <sig\_Bob> OP\_0 <redeemScript>}
+  \texttt{OP\_0 <sig\_Alice> <sig\_Bob> OP\_0 <redeemScript>}
  \end{exampleblock}
 \end{frame}
 \begin{frame}{Closure transaction}
@@ -578,7 +578,7 @@
 \end{frame}
 \begin{frame}{Closure transaction}
  \begin{exampleblock}{Spending funding smart contract (refund)}
-  We now need to spend the \textit{redeemScript}
+  We now need to spend the \textit{redeemScript} after the lock time
   \pause
   \begin{center}
    \texttt{<sig\_Alice> OP\_1}
@@ -596,6 +596,262 @@
  \end{center}
 \end{frame}
 \section{Bidirectional payment channels}
+\begin{frame}{Bidirectional payment channel}
+ \begin{block}{What allows to do?}
+  Incrementally pay amounts of funds from one party to another \textbf{and viceversa}
+ \end{block}
+ \pause
+ \begin{exampleblock}{For instance...}
+  We will create a channel to allow \textbf{Alice} pay \textbf{Bob} incremental amounts of funds \textbf{and viceversa}
+ \end{exampleblock}
+\end{frame}
 \subsection{Scheme}
+\begin{frame}{Bidirectional payment channels' scheme}
+ \begin{block}{Source}
+  Obtained from
+  \begin{quote}
+   A Fast and Scalable Payment Network with Bitcoin Duplex Micropayment Channels - \textit{Christian Decker \& Roger Wattenhofer}
+  \end{quote}
+ \end{block}
+ \pause
+ \begin{block}{Idea}
+  Use \textbf{two unidirectional channels}, one in each way with an \textbf{invalidation tree} to perform resets
+ \end{block}
+\end{frame}
 \subsection{Implementation}
+\begin{frame}{Locking the funds}
+ \begin{block}{Ways to lock funds}
+  In order to accomplish both properties to lock funds, we can:
+  \begin{enumerate}
+   \item Create a \textbf{funding transaction} and a time-locked \textbf{refund transaction}
+   \item Create a \textbf{\textit{smart} funding transaction} with
+         the time-lock integrated in the \textit{smart contract}
+  \end{enumerate}
+ \end{block}
+ \pause
+ \begin{block}{The implementation}
+  We can still use \textbf{BIP-65} to create a time-locking smart contract
+ \end{block}
+\end{frame}
+\begin{frame}{Funding transaction}
+ \begin{exampleblock}{Funding transaction}
+  \includegraphics[width=\textwidth, height=0.8\textheight, keepaspectratio]{img/bidir_tx_funding.png}
+ \end{exampleblock}
+\end{frame}
+\begin{frame}{Funding transaction}
+ \begin{exampleblock}{Funding smart contract}
+  Same as unidirectional channel, but with two outputs
+  \pause
+  \begin{center}
+   \begin{enumerate}[<+->]
+    \item \textbf{Alice to Bob output}\\
+          \small{\texttt{OP\_IF <time> OP\_CHECKLOCKTIMEVERIFY OP\_DROP <PubKeyAlice\_1> OP\_CHECKSIG OP\_ELSE OP\_2 <PubKeyAlice\_2> <PubKeyBob\_1> OP\_2 OP\_CHECKMULTISIG OP\_ENDIF}}
+    \item \textbf{Bob to Alice output}\\
+          \small{\texttt{OP\_IF <time> OP\_CHECKLOCKTIMEVERIFY OP\_DROP <PubKeyBob\_2> OP\_CHECKSIG OP\_ELSE OP\_2 <PubKeyAlice\_3> <PubKeyBob\_3> OP\_2 OP\_CHECKMULTISIG OP\_ENDIF}}
+   \end{enumerate}
+  \end{center}
+ \end{exampleblock}
+ \pause
+ \begin{exampleblock}{Technically...}
+  As we are creating a P2SH, then the outputs' script must be:\
+  \texttt{OP\_HASH160 <redeemScript\_hash> OP\_EQUAL}
+ \end{exampleblock}
+\end{frame}
+\begin{frame}{Paying funds}
+ \begin{block}{What do we need to do?}
+  In order to create a payment transaction, as both users must authorize payments:
+  \begin{enumerate}
+   \item \textbf{Alice} creates and signs a transaction paying some of the locked funds to \textbf{Bob} (and the rest to Alice as return)
+   \item \textbf{Bob} stores the partially signed transaction that pays some amount of money to him
+   \item If \textbf{Alice} wants to pay more, repeats the first step with more funds (spending the same funding transaction)
+  \end{enumerate}
+ \end{block}
+ \pause
+ \begin{block}{The implementation}
+  Same of a unidirectional payment channel, but Bob can pay Alice too using his channel
+ \end{block}
+\end{frame}
+\begin{frame}{Payment transaction}
+ \begin{exampleblock}{Payment transaction}
+  \includegraphics[width=\textwidth, height=0.8\textheight, keepaspectratio]{img/bidir_tx_payment.png}
+ \end{exampleblock}
+\end{frame}
+\begin{frame}{Payment transaction}
+ \begin{exampleblock}{Spending funding smart contract}
+  We now need to spend the \textit{redeemScript}
+  \pause
+  \begin{center}
+   \begin{enumerate}[<+->]
+    \item \textbf{Alice to Bob output}\\
+          \small{\texttt{OP\_0 <sig\_Alice> <sig\_Bob> OP\_0}}
+    \item \textbf{Bob to Alice output}\\
+          \small{\texttt{OP\_0 <sig\_Alice> <sig\_Bob> OP\_0}}
+   \end{enumerate}
+  \end{center}
+ \end{exampleblock}
+ \begin{exampleblock}{Technically...}
+  As we are spending a P2SH, then the input script must be:\
+  \texttt{OP\_0 <sig\_Alice> <sig\_Bob> OP\_0 <redeemScript>}
+ \end{exampleblock}
+\end{frame}
+\begin{frame}{Closure transaction}
+ \begin{block}{What do we need to do?}
+  Two situations can appear when closing the channel:
+  \begin{enumerate}
+   \item \textbf{Graceful closure}: the channel has been operated and the expiry time is close, so \textbf{latest payment transaction \underline{of each output} is broadcasted}, spending the funding transaction and closing the channel.
+   \item \textbf{No cooperation}: if any of the parties do not cooperate, they can \textbf{broadcast a refund transaction} to recover their locked funds
+  \end{enumerate}
+ \end{block}
+ \pause
+ \begin{exampleblock}{Graceful closure}
+  Alice and Bob simply broadcast the latest payment transaction once signed and before channel expiry time
+ \end{exampleblock}
+\end{frame}
+\begin{frame}{Closure transaction}
+ \begin{exampleblock}{Closure transaction (refund)}
+  \includegraphics[width=\textwidth, height=0.8\textheight, keepaspectratio]{img/bidir_tx_refund.png}
+ \end{exampleblock}
+\end{frame}
+\begin{frame}{Closure transaction}
+ \begin{exampleblock}{Spending funding smart contract (refund)}
+  We now need to spend the \textit{redeemScript} after the lock time
+  \pause
+  \begin{center}
+   \begin{enumerate}[<+->]
+    \item \textbf{Alice to Bob output refund}\\
+          \texttt{<sig\_Alice> OP\_1}
+    \item \textbf{Bob to Alice output refund}\\
+          \texttt{<sig\_Bob> OP\_1}
+   \end{enumerate}
+  \end{center}
+ \end{exampleblock}
+ \pause
+ \begin{exampleblock}{Technically...}
+  As we are spending a P2SH, then the input script must be:\
+  \texttt{<sig\_Alice|Bob> OP\_1 <redeemScript>}
+ \end{exampleblock}
+\end{frame}
+\subsection{Problem: channel reseting}
+\begin{frame}
+ \begin{center}
+  \textbf{What if one of the payment channels gets exhausted?}\\
+  \pause
+  \huge\textbf{Channel resetting}
+ \end{center}
+\end{frame}
+\begin{frame}{Channel resetting}
+ \begin{exampleblock}{A simple reset example}
+  \begin{center}
+   \includegraphics[width=\textwidth, height=0.8\textheight, keepaspectratio]{img/bidir_reset.png}
+  \end{center}
+ \end{exampleblock}
+\end{frame}
+\begin{frame}{Channel resetting}
+ \begin{alertblock}
+  Both parties own the same amount of funds as at the beginning of the channel but their respective payment channels have been exhausted. No more incremental payments can be performed
+ \end{alertblock}
+\end{frame}
+\begin{frame}{Resetting by invalidation trees}
+ \begin{block}{Invalidation tree}
+  Tree of transactions that use the timelock field to invalidate old branches of the tree and be able to create new ones with an updated status of the balances
+ \end{block}
+ \pause
+ \begin{block}{Replace by timelock}
+  Create timelocked transactions so that when using timelocks nearer to the present invalidate transactions with later timelocks
+ \end{block}
+\end{frame}
+\begin{frame}{An invalidation tree reset example}
+ \begin{exampleblock}{Reset by adding a new leaf}
+  \begin{center}
+   \includegraphics[width=\textwidth, height=0.8\textheight, keepaspectratio]{img/bidir_tree.png}
+  \end{center}
+ \end{exampleblock}
+\end{frame}
+\begin{frame}{An invalidation tree reset example}
+ \begin{exampleblock}{Reset by branching}
+  \begin{center}
+   \includegraphics[width=\textwidth, height=0.8\textheight, keepaspectratio]{img/bidir_tree_expanded.png}
+  \end{center}
+ \end{exampleblock}
+\end{frame}
+\begin{frame}{Differences}
+ \begin{block}{Basic duplex channel vs Resetable duplex channel}
+  \begin{itemize}[<+->]
+   \item \textbf{More complex to use BIP-65*}: As the tree requires linking P2SH single outputs, we can't use BIP-65 to create a timelock contract.
+         \pause
+         \small{*this would require to generate two outputs and inputs in each first tree node with all data required}
+   \item \textbf{More transactions needed:} in order to create the tree (be careful with signing order of all parties to prevent attacks)
+   \item \textbf{Reduced expiry time:} each tree branch reduces the channel's effective expiry time
+  \end{itemize}
+ \end{block}
+\end{frame}
+\begin{frame}{Pros and cons}
+ \begin{exampleblock}{Pros}
+  \begin{itemize}[<+->]
+   \item \textbf{Simple to create}: no complex transactions needed, unlike the \textit{Lightning Network} smart contracts
+   \item \textbf{No extra data exchange}: unlike the \textit{Lightning Network}, the protocol does not require to exchange secrets or additional data
+  \end{itemize}
+ \end{exampleblock}
+ \pause
+ \begin{alertblock}{Cons}
+  \begin{itemize}[<+->]
+   \item \textbf{Reducing expiry time}: the more resets needed, the more the effective expiry time is reduced (more invalidating branches and leafs)
+   \item \textbf{Need to store more transactions}: in other solutions for duplex payment channel, like the \textit{Lightning Network}, just the latest payment transaction must be saved, and not an entire tree.
+  \end{itemize}
+ \end{alertblock}
+\end{frame}
+\section{The Bitcoin framework}
+\begin{frame}{Developing problems}
+ \begin{alertblock}{Problems when implementing the channel}
+  \begin{itemize}[<+->]
+   \item \textbf{Lack of documentation}: Bitcoin is missing from good quality, low-level protocol implementation details. Most accurate information is spread around Q\&A sites, \textit{Bitcoin Wiki} and \textit{Bitcoin Core's client} C++ code
+   \item \textbf{Lack of low-level, documented libraries}: There are very few libraries that handle the Bitcoin protocol complexities (no library found to create raw transaction signatures with a customized transaction)
+  \end{itemize}
+ \end{alertblock}
+\end{frame}
+\begin{frame}{Our Bitcoin framework}
+ \begin{exampleblock}{Solution: our own Bitcoin framework}
+  All what we* learned was implemented in our own Bitcoin framework that has:
+  \begin{itemize}
+   \item \textbf{Designed for ease of use:} Everything was first designed previous to its codification using software patterns to enhace developers' usability
+   \item \textbf{OOP and puzzle-friendliness principles:} All data we have learned has been coded into serializable and deserializable classes that can be joined together making the framework a modulable puzzle of Bitcoin data pieces implemented as classes
+   \item \textbf{Extensive documentation:} Every file, class and method is properly commented in order to generate an understandable and extensive documentation
+   \item \textbf{Extensively tested:} Every module has been tested with other libraries and with the \textit{Bitcoin Core} client, sending transactions formed with the framework to the Bitcoin's \textit{testnet}
+  \end{itemize}
+  \pause
+  \begin{center}
+   *developed along Carlos González Cebrecos
+  \end{center}
+ \end{exampleblock}
+\end{frame}
+\begin{frame}{Channel implementation}
+ \begin{block}{Fork of the Bitcoin framework}
+  The channel was implemented forking the framework in a script so it can be operated from the CLI passing the required parameters (funds amount, public and private keys, previous inputs, ...)
+ \end{block}
+ \pause
+ \begin{alertblock}{Channel lacks ease of use}
+  Because focused on the \textbf{channel protocol's design to enhace security}, no time was missing to automate the operatibility of the channel:
+  \begin{itemize}
+   \item \textbf{Bitcoin Core RPC:} to automate transaction broadcasting, UTXO detection, balance detection, fee calculation, ...
+   \item \textbf{Channel state storage:} automatically store in the user's computer the state of the channel (transactions' tree and refunds)
+   \item \textbf{Graphical UI:} to enable every Bitcoin user enjoy the payment channels' power
+  \end{itemize}
+ \end{alertblock}
+\end{frame}
+\section{Conclusions}
+\begin{frame}
+    Along this project, I've learned:
+    \begin{itemize}[<+->]
+        \item \textbf{Low-level understanding of the Bitcoin protocol}: By learning how to implement Smart Contracts on Bitcoin and creating the framework to ease those smart contracts creation
+        \item \textbf{Bitcoin lacks of low-level extensive documentation}: Developing in Bitcoin has no formal, low-level detailed guide and most advanced features can just be learned by inspecting the \textit{Bitcoin Core} C++ code
+        \item \textbf{Payment Channels are the future of Bitcoin}: Maybe \textit{Lightning Network} has a better structure and protocol implementation, but what is crystal clear is that multi-hop duplex payment channels are the Bitcoin's future after \textit{SegWit.co} activates in the \textit{mainnet} allowing a secure implementation of them.
+    \end{itemize}
+\end{frame}
+\begin{frame}
+    \begin{center}
+        \textbf{\huge{Thanks for your attention}}\\
+        \pause
+        Q\&A round
+    \end{center}
+\end{frame}
 \end{document}
