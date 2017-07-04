@@ -88,10 +88,17 @@ Date: 04/07/2017
 
 ### First version (final)
 Date: 04/07/2017
-- [PDF format](presentation/presentation.pdf)
-- [TEX sources](presentation/presentation.tex)
+- [PDF format](https://github.com/davidlj95/smart-payment-channel/raw/d7cef1ce376feb58a59ad015819bd35fd0f9fc2d/presentation/presentation.pdf)
+- [TEX sources](https://github.com/davidlj95/smart-payment-channel/raw/d7cef1ce376feb58a59ad015819bd35fd0f9fc2d/presentation/presentation.tex)
 
 [Changelog](https://github.com/davidlj95/smart-payment-channel/commit/d7cef1ce376feb58a59ad015819bd35fd0f9fc2d)
+
+### Short version (final)
+Date: 04/07/2017
+- [PDF format](presentation/presentation_short.pdf)
+- [TEX sources](presentation/presentation_short.tex)
+
+[Changelog](https://github.com/davidlj95/smart-payment-channel/commit/a84fde59cd20a2c0b786b4393db29401312cb1fe)
 
 # Code
 The project code is available on the following GitHub repository:
