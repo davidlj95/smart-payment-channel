@@ -109,8 +109,13 @@ https://github.com/davidlj95/smart-payment-channel
 A local copy of the code is also available in the following folder:
  - [Python sources](smart-payment-channel)
 > Just for the offline, delivered package, if online, check the mentioned repository
+## How to use guide
+For usage and syntax, check the following how-to use guide:
+<center>
+https://davidlj95.com/smart-payment-channel/how-to/
+</center>
 
-For usage and syntax, check the whitepaper's implementation section.
+[Sources available](https://davidlj95.com/smart-payment-channel/how-to/index.md)
 # About this package
 This package containing a summary of all work performed during the progress development is also available on-line in the `gh-pages` branch of the previously mentioned [repository](https://github.com/davidlj95/smart-payment-channel). It's on-line version is available in:
 <center>
