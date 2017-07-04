@@ -21,7 +21,7 @@ DEFAULT_PARSER = argparse.ArgumentParser(
 DEFAULT_PARSER.add_argument(
     "-v", "--version",
     action="version",
-    version="v0.11"
+    version="v0.12"
 )
 DEFAULT_PARSER.add_argument(
     "-l", "--log-level",
@@ -58,31 +58,31 @@ DEFAULT_PARSER.add_argument(
     default=TREE_DEPTH_DEFAULT
 )
 DEFAULT_PARSER.add_argument(
-    "-p", "--pub-keys",
-    action="store",
-    nargs=2,
-    help="specifies the public keys to use for the channel multisignatures. " +
-         "Must be specified in the correct order"
-)
-DEFAULT_PARSER.add_argument(
     "-f", "--funds",
     action="store",
     nargs=2,
     help="sets the amount of funds that each party will dedicate to their " +
          "unidirectional channel to pay the other party",
-    type=float,
-    default=[]
+    type=float
 )
 DEFAULT_PARSER.add_argument(
-    "-u", "--utxo",
+    "--utxo-ids",
     action="store",
     nargs=2,
-    help="sets an UTXO (txId in hex and output number) to spend those funds",
-    default=[]
+    help="sets the list of utxo previous tx ids to use to fund the channel. " +
+         "Specify them in order (first Alice, then Bob)",
 )
 DEFAULT_PARSER.add_argument(
-    "--priv-key",
+    "--utxo-nums",
     action="store",
+    nargs=2,
+    help="sets the list of utxo previous ouput numbers to use to fund the "
+         "channel. Specify them in order (first Alice, then Bob)",
+)
+DEFAULT_PARSER.add_argument(
+    "--priv-keys",
+    action="store",
+    nargs=2,
     help="specifies a WIF encoded private key to use for signing transactions",
     type=str
 )
@@ -106,7 +106,7 @@ DEFAULT_PARSER.add_argument(
     action="store",
     help="number of times the channel has been previously reset",
     type=int,
-    default=-1
+    default=None
 )
 DEFAULT_PARSER.add_argument(
     "-b", "--balances",
@@ -115,4 +115,18 @@ DEFAULT_PARSER.add_argument(
     help="the balance to update the channel reset with",
     type=float,
     default=[]
+)
+DEFAULT_PARSER.add_argument(
+    "--to",
+    action="store",
+    nargs=2,
+    help="specifies in a payment operation who to pay (Alice or Bob) and the "
+         "amount to pay (example --to alice 5 for bob to pay 5 btc to alice)",
+    type=str
+)
+DEFAULT_PARSER.add_argument(
+    "--verbose",
+    action="store_true",
+    help="prints not just the hexadecimal transactions but also their content "
+         "in human readable mode"
 )
