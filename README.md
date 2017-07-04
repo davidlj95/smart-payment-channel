@@ -6,9 +6,10 @@
 <h4>Author</h4>
 <b>David Lozano Jarque (NIU 1359958)</b>
 <br/>
-Escola d'Enginyeria, Universitat Autònoma de Barcelona
+Escola d'Enginyeria, Universitat Autònoma de Barcelona<br/>
 Course 2016-2017
 </center>
+
 # Reports
 The following reports have been written during the project development:
 > - As the reports are stored in a repository, just current versions are included in this package, old versions are links to the old repository versions
@@ -70,23 +71,34 @@ Date: 10/06/2017
 [Changelog](https://github.com/davidlj95/smart-payment-channel/commit/889a219ea6930e219604e876d4fc172d6884cd33)
 # Presentation
 Slides to present the project to the court
-## First version (unfinished)
+## Versions
+### First version (unfinished)
 Date: 03/07/2017
 - [PDF format](https://github.com/davidlj95/smart-payment-channel/raw/6018b348c188ab81b4e832bc3bd01a5a68971a8d/presentation/presentation.pdf)
 - [TEX sources](https://github.com/davidlj95/smart-payment-channel/raw/6018b348c188ab81b4e832bc3bd01a5a68971a8d/presentation/presentation.tex)
 
 [Changelog](https://github.com/davidlj95/smart-payment-channel/commit/6018b348c188ab81b4e832bc3bd01a5a68971a8d)
-## First version
+
+### First version (formatting issues)
+Date: 04/07/2017
+- [PDF format](https://github.com/davidlj95/smart-payment-channel/raw/d7bd570b4bdea064cade6ff7bf500bead48096bd/presentation/presentation.pdf)
+- [TEX sources](https://github.com/davidlj95/smart-payment-channel/raw/d7bd570b4bdea064cade6ff7bf500bead48096bd/presentation/presentation.tex)
+
+[Changelog](https://github.com/davidlj95/smart-payment-channel/commit/d7bd570b4bdea064cade6ff7bf500bead48096bd)
+
+### First version (final)
 Date: 04/07/2017
 - [PDF format](presentation/presentation.pdf)
 - [TEX sources](presentation/presentation.tex)
 
-[Changelog](https://github.com/davidlj95/smart-payment-channel/commit/d7bd570b4bdea064cade6ff7bf500bead48096bd)
+[Changelog](https://github.com/davidlj95/smart-payment-channel/commit/d7cef1ce376feb58a59ad015819bd35fd0f9fc2d)
+
 # Code
 The project code is available on the following GitHub repository:
 <center>
 https://github.com/davidlj95/smart-payment-channel
 </center>
+
 A local copy of the code is also available in the following folder:
  - [Python sources](smart-payment-channel)
 > Just for the offline, delivered package, if online, check the mentioned repository
