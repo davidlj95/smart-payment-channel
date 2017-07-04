@@ -515,7 +515,8 @@
   \pause
   \begin{center}
    \texttt{OP\_IF <time>}\\
-   \texttt{OP\_CHECKLOCKTIMEVERIFY OP\_DROP <PubKeyAlice\_1> OP\_CHECKSIG}\\
+   \texttt{OP\_CHECKLOCKTIMEVERIFY OP\_DROP}\\
+   \texttt{<PubKeyAlice\_1> OP\_CHECKSIG}\\
    \texttt{OP\_ELSE}\\
    \texttt{OP\_2 <PubKeyAlice\_2> <PubKeyBob> OP\_2 OP\_CHECKMULTISIG OP\_ENDIF}
   \end{center}
@@ -523,7 +524,9 @@
  \pause
  \begin{exampleblock}{Technically...}
   As we are creating a P2SH, then the output script must be:\
-  \texttt{OP\_HASH160 <redeemScript\_hash> OP\_EQUAL}
+  \begin{center}
+   \texttt{OP\_HASH160 <redeemScript\_hash> OP\_EQUAL}
+  \end{center}
  \end{exampleblock}
 \end{frame}
 \begin{frame}{Paying funds}
@@ -555,7 +558,10 @@
  \end{exampleblock}
  \begin{exampleblock}{Technically...}
   As we are spending a P2SH, then the input script must be:\
-  \texttt{OP\_0 <sig\_Alice> <sig\_Bob> OP\_0 <redeemScript>}
+  \begin{center}
+   \texttt{OP\_0 <sig\_Alice> <sig\_Bob> OP\_0 <redeemScript>}
+  \end{center}
+
  \end{exampleblock}
 \end{frame}
 \begin{frame}{Closure transaction}
@@ -587,7 +593,10 @@
  \pause
  \begin{exampleblock}{Technically...}
   As we are spending a P2SH, then the input script must be:\
-  \texttt{<sig\_Alice> OP\_1 <redeemScript>}
+  \begin{center}
+   \texttt{<sig\_Alice> OP\_1 <redeemScript>}
+  \end{center}
+
  \end{exampleblock}
 \end{frame}
 \begin{frame}
@@ -654,7 +663,10 @@
  \pause
  \begin{exampleblock}{Technically...}
   As we are creating a P2SH, then the outputs' script must be:\
-  \texttt{OP\_HASH160 <redeemScript\_hash> OP\_EQUAL}
+  \begin{center}
+   \texttt{OP\_HASH160 <redeemScript\_hash> OP\_EQUAL}
+  \end{center}
+
  \end{exampleblock}
 \end{frame}
 \begin{frame}{Paying funds}
@@ -691,7 +703,10 @@
  \end{exampleblock}
  \begin{exampleblock}{Technically...}
   As we are spending a P2SH, then the input script must be:\
-  \texttt{OP\_0 <sig\_Alice> <sig\_Bob> OP\_0 <redeemScript>}
+  \begin{center}
+   \texttt{OP\_0 <sig\_Alice> <sig\_Bob> OP\_0 <redeemScript>}
+  \end{center}
+
  \end{exampleblock}
 \end{frame}
 \begin{frame}{Closure transaction}
@@ -728,7 +743,10 @@
  \pause
  \begin{exampleblock}{Technically...}
   As we are spending a P2SH, then the input script must be:\
-  \texttt{<sig\_Alice|Bob> OP\_1 <redeemScript>}
+  \begin{center}
+   \texttt{<sig\_Alice|Bob> OP\_1 <redeemScript>}
+  \end{center}
+
  \end{exampleblock}
 \end{frame}
 \subsection{Problem: channel reseting}
@@ -747,7 +765,7 @@
  \end{exampleblock}
 \end{frame}
 \begin{frame}{Channel resetting}
- \begin{alertblock}
+ \begin{alertblock}{Channels are exhausted}
   Both parties own the same amount of funds as at the beginning of the channel but their respective payment channels have been exhausted. No more incremental payments can be performed
  \end{alertblock}
 \end{frame}
@@ -768,6 +786,13 @@
  \end{exampleblock}
 \end{frame}
 \begin{frame}{An invalidation tree reset example}
+ \begin{exampleblock}{Different funding}
+  \begin{center}
+   \includegraphics[width=\textwidth, height=0.8\textheight, keepaspectratio]{img/bidir_tree_fund.png}
+  \end{center}
+ \end{exampleblock}
+\end{frame}
+\begin{frame}{An invalidation tree reset example}
  \begin{exampleblock}{Reset by branching}
   \begin{center}
    \includegraphics[width=\textwidth, height=0.8\textheight, keepaspectratio]{img/bidir_tree_expanded.png}
@@ -777,9 +802,10 @@
 \begin{frame}{Differences}
  \begin{block}{Basic duplex channel vs Resetable duplex channel}
   \begin{itemize}[<+->]
-   \item \textbf{More complex to use BIP-65*}: As the tree requires linking P2SH single outputs, we can't use BIP-65 to create a timelock contract.
+   \item \textbf{More complex to use BIP-65*}: As the tree requires linking P2SH single outputs, using BIP-65 to create a timelock contract is more complex to implement\\
          \pause
          \small{*this would require to generate two outputs and inputs in each first tree node with all data required}
+         \pause
    \item \textbf{More transactions needed:} in order to create the tree (be careful with signing order of all parties to prevent attacks)
    \item \textbf{Reduced expiry time:} each tree branch reduces the channel's effective expiry time
   \end{itemize}
@@ -812,46 +838,64 @@
 \begin{frame}{Our Bitcoin framework}
  \begin{exampleblock}{Solution: our own Bitcoin framework}
   All what we* learned was implemented in our own Bitcoin framework that has:
-  \begin{itemize}
-   \item \textbf{Designed for ease of use:} Everything was first designed previous to its codification using software patterns to enhace developers' usability
-   \item \textbf{OOP and puzzle-friendliness principles:} All data we have learned has been coded into serializable and deserializable classes that can be joined together making the framework a modulable puzzle of Bitcoin data pieces implemented as classes
-   \item \textbf{Extensive documentation:} Every file, class and method is properly commented in order to generate an understandable and extensive documentation
-   \item \textbf{Extensively tested:} Every module has been tested with other libraries and with the \textit{Bitcoin Core} client, sending transactions formed with the framework to the Bitcoin's \textit{testnet}
+  \begin{itemize}[<+->]
+   \item \textbf{Designed for ease of use:} Design \& Software design patterns
+   \item \textbf{OOP and puzzle-friendliness principles:} Modulable and serializable / deserializable patterns
+   \item \textbf{Extensive documentation:} Every method is well documented
+   \item \textbf{Extensively tested:} All code has been tested with other libraries \& \textit{Bitcoin Core} client
   \end{itemize}
-  \pause
-  \begin{center}
-   *developed along Carlos González Cebrecos
-  \end{center}
  \end{exampleblock}
+ \uncover<2->{\begin{center}
+  *developed along Carlos González Cebrecos
+  \end{center}}
 \end{frame}
 \begin{frame}{Channel implementation}
  \begin{block}{Fork of the Bitcoin framework}
-  The channel was implemented forking the framework in a script so it can be operated from the CLI passing the required parameters (funds amount, public and private keys, previous inputs, ...)
+  The channel was implemented in a script after forking the framework and can be operated from the CLI passing the required parameters (funds amount, pub/priv keys, previous inputs, ...)
  \end{block}
  \pause
  \begin{alertblock}{Channel lacks ease of use}
   Because focused on the \textbf{channel protocol's design to enhace security}, no time was missing to automate the operatibility of the channel:
-  \begin{itemize}
+  \begin{itemize}[<+->]
    \item \textbf{Bitcoin Core RPC:} to automate transaction broadcasting, UTXO detection, balance detection, fee calculation, ...
-   \item \textbf{Channel state storage:} automatically store in the user's computer the state of the channel (transactions' tree and refunds)
-   \item \textbf{Graphical UI:} to enable every Bitcoin user enjoy the payment channels' power
+   \item \textbf{Channel state storage:} automatically store in the user's computer the state of the channel
+   \item \textbf{Graphical UI:} enable every Bitcoin user enjoy the payment channels' potential
   \end{itemize}
  \end{alertblock}
 \end{frame}
 \section{Conclusions}
 \begin{frame}
-    Along this project, I've learned:
-    \begin{itemize}[<+->]
-        \item \textbf{Low-level understanding of the Bitcoin protocol}: By learning how to implement Smart Contracts on Bitcoin and creating the framework to ease those smart contracts creation
-        \item \textbf{Bitcoin lacks of low-level extensive documentation}: Developing in Bitcoin has no formal, low-level detailed guide and most advanced features can just be learned by inspecting the \textit{Bitcoin Core} C++ code
-        \item \textbf{Payment Channels are the future of Bitcoin}: Maybe \textit{Lightning Network} has a better structure and protocol implementation, but what is crystal clear is that multi-hop duplex payment channels are the Bitcoin's future after \textit{SegWit.co} activates in the \textit{mainnet} allowing a secure implementation of them.
-    \end{itemize}
+ Along this project, I've learned:
+ \begin{itemize}[<+->]
+  \item \textbf{Low-level understanding of the Bitcoin protocol}: By learning how to implement Smart Contracts on Bitcoin and creating the framework to ease those smart contracts creation
+  \item \textbf{Bitcoin lacks of low-level extensive documentation}: Developing in Bitcoin has no formal, low-level detailed guide and most advanced features can just be learned by inspecting the \textit{Bitcoin Core} C++ code
+  \item \textbf{Payment Channels are the future of Bitcoin}: Maybe \textit{Lightning Network} has a better structure and protocol implementation, but what is crystal clear is that multi-hop duplex payment channels are the Bitcoin's future after \textit{SegWit.co} activates in the \textit{mainnet} allowing a secure implementation of them.
+ \end{itemize}
 \end{frame}
 \begin{frame}
-    \begin{center}
-        \textbf{\huge{Thanks for your attention}}\\
-        \pause
-        Q\&A round
-    \end{center}
+ \begin{center}
+  \textbf{\huge{Thanks for your time and attention}}\\~\\
+  \pause
+  \huge{Q\&A round}
+ \end{center}
+\end{frame}
+\begin{frame}{For more information}
+ \begin{block}{The project work compilation}
+  \begin{center}
+   Documentation:\\
+   \url{https://davidlj95.com/smart-payment-channel}\\
+   Code:\\
+   \url{https://github.com/davidlj95/smart-payment-channel}
+  \end{center}
+ \end{block}
+ \pause
+ \begin{block}{The Bitcoin framework}
+  \begin{center}
+   \url{https://github.com/uab-projects/btc-payment-channels}\\
+   \pause
+   Test it!:\\
+   \texttt{pip install bitcoin-framework}
+  \end{center}
+ \end{block}
 \end{frame}
 \end{document}
