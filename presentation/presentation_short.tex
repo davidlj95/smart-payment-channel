@@ -185,9 +185,9 @@
  \end{block}
 \end{frame}
 \begin{frame}{Transaction throughput}
-  \begin{alertblock}{Increasing transaction demand}
-   As Bitcoin becomes more popular, more users arrive therefore more transactions need to be processed
-  \end{alertblock}
+ \begin{alertblock}{Increasing transaction demand}
+  As Bitcoin becomes more popular, more users arrive therefore more transactions need to be processed
+ \end{alertblock}
 \end{frame}
 \begin{frame}{Transaction throughput}
  \begin{center}
@@ -235,26 +235,26 @@
 \section{Bitcoin \& Smart Contracts}
 \subsection{Transactions at low-level detail}
 \begin{frame}{Transactions}
-  \begin{block}{Transaction fields}
-   Fields of a transaction are:
-   \begin{itemize}
-    \item \texttt{version}
-    \item \textbf{\texttt{inputs}}
-    \item \textbf{\texttt{outputs}}
-    \item \texttt{locktime}
-   \end{itemize}
-  \end{block}
-  \begin{exampleblock}{Basic Bitcoin transaction}
-   \begin{center}
-    \includegraphics[width=\textwidth, height=0.8\textheight, keepaspectratio]{img/basic_tx.png}
-   \end{center}
-  \end{exampleblock}
+ \begin{block}{Transaction fields}
+  Fields of a transaction are:
+  \begin{itemize}
+   \item \texttt{version}
+   \item \textbf{\texttt{inputs}}
+   \item \textbf{\texttt{outputs}}
+   \item \texttt{locktime}
+  \end{itemize}
+ \end{block}
+ \begin{exampleblock}{Basic Bitcoin transaction}
+  \begin{center}
+   \includegraphics[width=\textwidth, height=0.8\textheight, keepaspectratio]{img/basic_tx.png}
+  \end{center}
+ \end{exampleblock}
 \end{frame}
 \begin{frame}{Transactions}
-  \begin{block}{Extra "fields"}
-   All transactions have an id (also called \textit{txId}), that is the
-   double SHA-256 hash of the transaction bytes
-  \end{block}
+ \begin{block}{Extra "fields"}
+  All transactions have an id (also called \textit{txId}), that is the
+  double SHA-256 hash of the transaction bytes
+ \end{block}
 \end{frame}
 \begin{frame}
  \begin{center}
@@ -525,7 +525,7 @@
    \item Create a \textbf{\textit{smart} funding transaction} with
          the time-lock integrated in the \textit{smart contract}
   \end{enumerate}
-\end{block}
+ \end{block}
  \begin{block}{The implementation}
   We can still use \textbf{BIP-65} to create a time-locking smart contract
  \end{block}
@@ -722,7 +722,7 @@
  \end{exampleblock}
  \begin{center}
   *developed along Carlos González Cebrecos
-  \end{center}
+ \end{center}
 \end{frame}
 \begin{frame}{Channel implementation}
  \begin{block}{Fork of the Bitcoin framework}
@@ -745,6 +745,16 @@
   \item \textbf{Bitcoin lacks of low-level extensive documentation}
   \item \textbf{Payment Channels are the future of Bitcoin}
  \end{itemize}
+\end{frame}
+\begin{frame}{Application use}
+ \begin{center}
+  \includegraphics[width=\textwidth, height=0.6\textheight, keepaspectratio]{img/app.png}
+ \end{center}
+ \begin{block}{How to use}
+  \begin{center}
+   https://www.davidlj95.com/smart-payment-channel/how-to/
+  \end{center}
+ \end{block}
 \end{frame}
 \begin{frame}
  \begin{center}
